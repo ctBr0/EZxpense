@@ -1,0 +1,7 @@
+{
+  "name": "EZxpense",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
