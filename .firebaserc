@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "ezxpense-d7716": {
+      "hosting": {
+        "app": [
+          "ezxpense-d7716"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "ezxpense-d7716"
+  }
+}
