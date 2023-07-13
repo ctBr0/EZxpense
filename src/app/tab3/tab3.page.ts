@@ -3,6 +3,7 @@ import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-tab3',
@@ -13,10 +14,19 @@ import { Router } from '@angular/router';
 })
 export class Tab3Page {
   
+  profile:any;
+  
   constructor(
     private authService: AuthService,
     private router: Router,
-    ) {}
+    private dataService: DataService
+  ) {
+    this.dataService.getUserProfile().subscribe((data) => {
+      this.profile = data;
+    })
+  }
+
+  
 
   async logout() {
     await this.authService.logout();

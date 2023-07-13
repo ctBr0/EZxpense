@@ -5,6 +5,7 @@ import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule} f
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
+import { doc, setDoc, Firestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-signup',
@@ -23,11 +24,13 @@ export class SignupPage implements OnInit {
   private authService: AuthService,
 	private loadingController: LoadingController,
 	private alertController: AlertController,
+  private firestore: Firestore,
   ) {}
 
   ngOnInit() {
     this.credentials = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required, Validators.minLength(6)]],
       password: ['', [Validators.required, Validators.minLength(8)]]
 	  });
   }
@@ -35,6 +38,10 @@ export class SignupPage implements OnInit {
 	get email() {
 		return this.credentials.get('email');
 	}
+
+  get username() {
+    return this.credentials.get('username');
+  }
 
 	get password() {
 		return this.credentials.get('password');
@@ -46,6 +53,12 @@ export class SignupPage implements OnInit {
 
     try {
       const user = await this.authService.register(this.credentials.value);
+
+      await setDoc(doc(this.firestore, "users", user.user.uid), {
+        email: this.credentials.value.email,
+        username: this.credentials.value.username
+      });
+
       await loading.dismiss();
       this.router.navigateByUrl('/tabs', { replaceUrl: true });
     } catch (error: any) {

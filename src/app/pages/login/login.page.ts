@@ -14,6 +14,7 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule]
 })
 export class LoginPage implements OnInit {
+  
   credentials: FormGroup;
 
 	constructor(

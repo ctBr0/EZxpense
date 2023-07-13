@@ -1,14 +1,23 @@
 import { Injectable } from '@angular/core';
-import { Firestore } from '@angular/fire/firestore';
-import { collection } from '@firebase/firestore';
+import { doc, docData, addDoc, Firestore } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
-  constructor(private firestore: Firestore) { }
+  constructor(
+    private firestore: Firestore,
+    private auth:Auth
+    ) { }
 
+  getUserProfile() {
+    const user:any = this.auth.currentUser;
+    const userDocRef = doc(this.firestore, `users/${user.uid}`);
+    return docData(userDocRef);
+  }
+  
   /*
   getUserBillsDueInSameMonth(username)
   {
