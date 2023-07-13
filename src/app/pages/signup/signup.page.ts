@@ -44,17 +44,17 @@ export class SignupPage implements OnInit {
 		const loading = await this.loadingController.create();
 		await loading.present();
 
-		const user = await this.authService.register(this.credentials.value);
-		await loading.dismiss();
-
-		if (user) {
-			this.router.navigateByUrl('/tabs', { replaceUrl: true });
-		} else {
-			this.showAlert('Registration failed');
-		}
+    try {
+      const user = await this.authService.register(this.credentials.value);
+      await loading.dismiss();
+      this.router.navigateByUrl('/tabs', { replaceUrl: true });
+    } catch (error: any) {
+      await loading.dismiss();
+      this.showFailedAlert(this.errorCodeToString(error.code.toString()));
+    }
 	}
 
-	async showAlert(message: any) {
+	async showFailedAlert(message: string) {
 		const alert = await this.alertController.create({
 			message,
 			buttons: ['Try again']
@@ -64,5 +64,18 @@ export class SignupPage implements OnInit {
 
   goToLogInPage() {
     this.router.navigate(['/login']);
+  }
+  
+  errorCodeToString(code: string): string {
+    switch (code) {
+      case 'auth/email-already-in-use':
+        return "Email address already in use.";
+        break;
+      case "auth/invalid-email":
+        return "Email address is invalid.";
+        break;
+      default:
+        return code;
+    }
   }
 }

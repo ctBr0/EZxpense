@@ -42,18 +42,18 @@ export class LoginPage implements OnInit {
 	async login() {
 		const loading = await this.loadingController.create();
 		await loading.present();
+    
+    try {
+      const user = await this.authService.login(this.credentials.value);
+      await loading.dismiss();
+      this.router.navigateByUrl('/tabs', { replaceUrl: true });
+    } catch (error: any) {
+      await loading.dismiss();
+      this.showFailedAlert(this.errorCodeToString(error.code.toString()));
+    }
+  }
 
-		const user = await this.authService.login(this.credentials.value);
-		await loading.dismiss();
-
-		if (user) {
-			this.router.navigateByUrl('/tabs', { replaceUrl: true });
-		} else {
-			this.showFailedAlert('Login failed');
-		}
-	}
-
-	async showFailedAlert(message: any) {
+	async showFailedAlert(message: string) {
 		const alert = await this.alertController.create({
 			message,
 			buttons: ['Try again']
@@ -63,5 +63,18 @@ export class LoginPage implements OnInit {
 
   goToRegistrationPage() {
     this.router.navigate(['/signup']);
+  }
+
+  errorCodeToString(code: string): string {
+    switch (code) {
+      case 'auth/user-not-found':
+        return "User does not exist.";
+        break;
+      case "auth/wrong-password":
+        return "Incorrect password.";
+        break;
+      default:
+        return code;
+    }
   }
 }

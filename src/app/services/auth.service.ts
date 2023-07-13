@@ -9,22 +9,13 @@ export class AuthService {
   constructor(private auth: Auth) { }
 
   async register({ email, password }: any) {
-    try {
-      const user = await createUserWithEmailAndPassword(this.auth, email, password);
-      return user;
-    } catch (e) {
-      return null;
-    }
+    const user = await createUserWithEmailAndPassword(this.auth, email, password);
+    return user;
   }
 
   async login({ email, password }: any) {
-    try {
-      const user = await signInWithEmailAndPassword(this.auth, email, password);
-      return user;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
+    const user = await signInWithEmailAndPassword(this.auth, email, password);
+    return user;
   }
 
   async logout() {
@@ -34,6 +25,4 @@ export class AuthService {
   async deleteaccount(user: any) {
     return deleteUser(user);
   }
-
-
 }
