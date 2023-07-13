@@ -7,28 +7,23 @@
     </ion-card-header>
   
     <ion-card-content>
-      <ion-list [inset]="true">
 
-        <ion-item>
-          <ion-input placeholder="Username"></ion-input>
-          <ion-button fill="clear" slot="end">
-            <ion-icon name="information-circle"></ion-icon>
-          </ion-button>
+      <form [formGroup]="credentials" (ngSubmit)="login()">
+
+        <ion-item lines="none" class="ion-margin-bottom">
+          <ion-input type="email" placeholder="Email" formControlName="email" helperText="Enter a valid email" errorText="Invalid email"></ion-input>
         </ion-item>
       
-        <ion-item>
-          <ion-input placeholder="Password" type="password"></ion-input>
-          <ion-button fill="clear" slot="end">
-            <ion-icon name="information-circle"></ion-icon>
-          </ion-button>
+        <ion-item lines="none" class="ion-margin-bottom">
+          <ion-input placeholder="Password" type="password" formControlName="password" helperText="Password must be at least 8 characters long" errorText="Password must be at least 8 characters long"></ion-input>
         </ion-item>
-  
-      </ion-list>
 
-      <ion-button type="submit" expand="block" >Log in</ion-button>
-      <ion-button type="button" expand="block" fill="clear">
-        Not yet a member? Sign up!
-      </ion-button>
+        <ion-button type="submit" expand="block" [disabled]="!credentials.valid">Submit</ion-button>
+        <ion-button type="button" expand="block" fill="clear" (click)="goToRegistrationPage()">
+          Not yet a member? Sign up!
+        </ion-button>
+
+      </form>
 
     </ion-card-content>
   </ion-card>
