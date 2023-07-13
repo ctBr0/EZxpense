@@ -22,7 +22,4 @@ export class AuthService {
     return signOut(this.auth);
   }
 
-  async deleteaccount(user: any) {
-    return deleteUser(user);
-  }
 }

@@ -2,6 +2,18 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-button (click)="logout()">log out</ion-button>
-  <ion-button (click)="deleteaccount()">delete account</ion-button>
+  <ion-card>
+    <ion-card-header class="ion-text-center">
+      <ion-card-title>Account</ion-card-title>
+    </ion-card-header>
+  
+    <ion-card-content>
+      <ion-list [inset]="true">
+        <ion-item button id="present-alert">
+          <ion-label>Sign out</ion-label>
+        </ion-item>
+        <ion-alert trigger="present-alert" header="Are you sure you want to sign out?" [buttons]="alertButtons"></ion-alert>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
