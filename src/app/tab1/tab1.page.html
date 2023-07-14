@@ -3,6 +3,16 @@
 
 <ion-content [fullscreen]="true">
 
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+
   <ion-fab slot="fixed" vertical="bottom" horizontal="center">
     <ion-fab-button>
       <ion-icon name="add-circle-outline"></ion-icon>

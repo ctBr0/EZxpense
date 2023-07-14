@@ -116,6 +116,13 @@ export class Tab1Page implements AfterViewInit {
     return newDate.getDate() > currDate.getDate() ? newDate.getDate() - currDate.getDate() : 0;
   }
 
+  handleRefresh(event:any) {
+    setTimeout(() => {
+      this.getUserFields();
+      event.target.complete();
+    }, 2000);
+  }
+
   cancel() {
     this.modal.dismiss(null, 'cancel');
   }
