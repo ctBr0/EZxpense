@@ -90,6 +90,13 @@ export class Tab3Page implements OnInit{
     }
   }
 
+  handleRefresh(event:any) {
+    setTimeout(() => {
+      this.getUserFields();
+      event.target.complete();
+    }, 2000);
+  }
+  
   public alertButtons = [
     {
       text: 'Cancel',
