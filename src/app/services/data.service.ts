@@ -19,7 +19,6 @@ export class DataService {
     const docRef = doc(this.firestore, "users", user.uid);
     return docRef;
   }
-
   
   /*
   getUserExpensesDueInSameMonth(username)

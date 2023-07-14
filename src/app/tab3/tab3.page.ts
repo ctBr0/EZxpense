@@ -7,7 +7,7 @@ import { DataService } from '../services/data.service';
 import { LoadingController } from '@ionic/angular';
 import { IonModal } from '@ionic/angular';
 import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import { getDoc, updateDoc } from '@angular/fire/firestore';
+import { getDoc, serverTimestamp, updateDoc } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-tab3',
@@ -22,6 +22,7 @@ export class Tab3Page implements OnInit{
   email:string;
   monthlybudget:number;
   currenttotal:number;
+  updatedat:any;
 
   formG: FormGroup;
   
@@ -60,7 +61,8 @@ export class Tab3Page implements OnInit{
       const docRef = await this.dataService.getUserRef();
 
       await updateDoc(docRef, {
-        monthlybudget: budget
+        monthlybudget: budget,
+        updatedat: serverTimestamp()
       });
 
       await loading.dismiss();
@@ -76,17 +78,12 @@ export class Tab3Page implements OnInit{
     try {
 
       const docSnap = await getDoc(await this.dataService.getUserRef());
-      const username:string = docSnap.get('username');
-      const email:string = docSnap.get('email');
-      const monthlybudget:number = docSnap.get('monthlybudget');
-      const currenttotal:number = docSnap.get('currenttotal');
-
+      this.username = docSnap.get('username');
+      this.email = docSnap.get('email');
+      this.monthlybudget= docSnap.get('monthlybudget');
+      this.currenttotal = docSnap.get('currenttotal');
+      this.updatedat = docSnap.get('updatedat');
       await loading.dismiss();
-
-      this.username = username;
-      this.email = email;
-      this.monthlybudget = monthlybudget;
-      this.currenttotal = currenttotal;
 
     } catch (e) {
       await loading.dismiss();

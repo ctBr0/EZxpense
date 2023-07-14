@@ -5,7 +5,7 @@ import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule} f
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
-import { doc, setDoc, Firestore } from '@angular/fire/firestore';
+import { doc, setDoc, Firestore, serverTimestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-signup',
@@ -58,7 +58,8 @@ export class SignupPage implements OnInit {
         email: this.credentials.value.email,
         username: this.credentials.value.username,
         monthlybudget: 1000.0,
-        currenttotal: 0.0
+        currenttotal: 0.0,
+        updatedat: serverTimestamp()
       });
 
       await loading.dismiss();

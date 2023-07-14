@@ -18,16 +18,26 @@
   </ion-fab>
 
   <ion-card>
-    <ion-card-header>
-      Budget: $2000
+    <ion-card-header class="ion-text-center">
+      <ion-card-title>
+        Hello, {{username}}! 
+      </ion-card-title>
+      <ion-card-subtitle>
+        Budget this month: ${{monthlybudget}}
+      </ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      <canvas #doughnutCanvas style="position: relative; height:20vh; width:40vw"></canvas>
-      <ion-item>
-        <ion-text>5 days left until next cycle</ion-text>
-      </ion-item>
+      <canvas #doughnutCanvas></canvas>
     </ion-card-content>
   </ion-card>
+  <ion-content class="ion-padding">
+  <ion-item lines="none">
+    <ion-text>{{daysleftinmonth}} days left until next cycle</ion-text>
+  </ion-item>
+  <ion-item lines="none">
+    <ion-text>Status: {{status}}</ion-text>
+  </ion-item>
+</ion-content>
 
   <ion-modal trigger="open-edit-modal">
     <ng-template>
