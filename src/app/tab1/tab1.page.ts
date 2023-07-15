@@ -53,6 +53,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
       date: [this.currISOdate, [Validators.required]],
       category: ['', [Validators.required]]
 	  });
+
   }
 
   get name() {
@@ -174,11 +175,26 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
     try {
       await this.dataService.addExpense(this.expenseDeets.value);
-      await this.updateTotal(this.expenseDeets.value.amount)
+      await this.updateTotal(this.expenseDeets.value.amount);
       this.currenttotal = this.currenttotal + this.expenseDeets.value.amount;
       this.confirm();
+
+      let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+      this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+      this.daysleftinmonth = this.getRemainingDays();
+      this.status = this.currenttotal > this.monthlybudget ? "Budget exceeded" : "Within budget";
+
+      this.expenseDeets = this.fb.group({
+        name: ['', [Validators.required]],
+        amount: ['', [Validators.required, Validators.min(1)]],
+        date: [this.currISOdate, [Validators.required]],
+        category: ['', [Validators.required]]
+      });
+
+      // update the chart
       this.doughnutChart.data.datasets[0].data = [this.currenttotal,(this.monthlybudget-this.currenttotal)];
       await this.doughnutChart.update();
+
       await loading.dismiss();
 
     } catch(e) {
