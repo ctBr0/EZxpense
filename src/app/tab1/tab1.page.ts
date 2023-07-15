@@ -72,10 +72,10 @@ export class Tab1Page implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit() {
-    this.doughnutChartMethod();
+    this.start();
   }
 
-  async doughnutChartMethod() {
+  async start() {
     const loading = await this.loadingController.create();
 		await loading.present();
 
@@ -88,31 +88,36 @@ export class Tab1Page implements AfterViewInit, OnInit {
         await this.resetTotal();
       }
 
-      this.status = this.currenttotal > this.monthlybudget ? "Budget exceeded" : "Within budget";
+      this.doughnutChartMethod();
 
-      this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, {
-        type: 'doughnut',
-        data: {
-          labels: ['Total expenses', 'Remaining balance'],
-          datasets: [{
-            label: 'Amount',
-            data: [300,(this.monthlybudget-300)],
-            backgroundColor: [
-              'rgba(255, 159, 64, 0.2)',
-              'rgba(255, 99, 132, 0.2)',
-            ],
-            hoverBackgroundColor: [
-              '#FFCE56',
-              '#FF6384'
-            ]
-          }]
-        }
-      });
+      this.status = this.currenttotal > this.monthlybudget ? "Budget exceeded" : "Within budget";
+      
       await loading.dismiss();
     } catch(e) {
       await loading.dismiss();
     }
 
+  }
+
+  async doughnutChartMethod() {
+    this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, {
+      type: 'doughnut',
+      data: {
+        labels: ['Total expenses', 'Remaining balance'],
+        datasets: [{
+          label: 'Amount',
+          data: [this.currenttotal,(this.monthlybudget-this.currenttotal)],
+          backgroundColor: [
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 99, 132, 0.2)',
+          ],
+          hoverBackgroundColor: [
+            '#FFCE56',
+            '#FF6384'
+          ]
+        }]
+      }
+    });
   }
 
   async getUserUid() {
@@ -169,10 +174,24 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
     try {
       await this.dataService.addExpense(this.expenseDeets.value);
+      await this.updateTotal(this.expenseDeets.value.amount)
+      this.currenttotal = this.currenttotal + this.expenseDeets.value.amount;
+      this.confirm();
+      this.doughnutChart.data.datasets[0].data = [this.currenttotal,(this.monthlybudget-this.currenttotal)];
+      await this.doughnutChart.update();
       await loading.dismiss();
+
     } catch(e) {
       await loading.dismiss();
     }
+  }
+
+  async updateTotal(amount:number) {
+    const docRef = await this.dataService.getUserRef();
+    await updateDoc(docRef, {
+      currenttotal: this.currenttotal + amount,
+      updatedat: serverTimestamp()
+    });
   }
 
   parseISOString(s:string) {

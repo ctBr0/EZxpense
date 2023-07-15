@@ -30,7 +30,7 @@ export class DataService {
     
     try{
 
-      await addDoc(collection(this.firestore, "users", user.uid, "collection"), {
+      await addDoc(collection(this.firestore, "users", user.uid, "expenses"), {
         name: name,
         amount: amount,
         date: date,
