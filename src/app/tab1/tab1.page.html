@@ -64,40 +64,46 @@
       </ion-header>
       <ion-content class="ion-padding">
 
-        <ion-item lines="none" class="ion-margin-bottom">
-          <ion-input placeholder="Expense name"></ion-input>
-        </ion-item>
-      
-        <ion-item lines="none" class="ion-margin-bottom">
-          <ion-input placeholder="Amount"></ion-input>
-        </ion-item>
+        <form [formGroup]="expenseDeets" (ngSubmit)="addExpense()">
 
-        <ion-item lines="none" class="ion-margin-bottom" id="open-date-modal">
-          <ion-label>Date (MMMM YY)</ion-label>
-          <ion-note slot="end" id="datetimeValue"></ion-note>
-        </ion-item>
-        <ion-modal id="date-modal" trigger="open-date-modal">
-          <ng-template>
-            <ion-content>
-              <ion-datetime
-                id="datetime"
-                presentation="date"
-                min="2023-06-01"
-                max="2069-06-01"
-                value="2023-07-13"
-              ></ion-datetime>
-            </ion-content>
-          </ng-template>
-        </ion-modal>
+          <ion-item lines="none" class="ion-margin-bottom">
+            <ion-input type="text" placeholder="Expense name" formControlName="name" helperText="Enter a name" errorText="Must not be empty"></ion-input>
+          </ion-item>
+        
+          <ion-item lines="none" class="ion-margin-bottom">
+            <ion-input type="number" placeholder="Amount" formControlName="amount" helperText="Enter an amount" errorText="Must a value greater than zero"></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <ion-select lines="none" class="ion-margin-bottom" placeholder="Select a category" value="Groceries">
-            <ion-text slot="label">Category: </ion-text>
-            <ion-select-option value="Groceries">Groceries</ion-select-option>
-            <ion-select-option value="Dining">Dining</ion-select-option>
-            <ion-select-option value="Supplies">Supplies</ion-select-option>
-          </ion-select>
-        </ion-item>
+          <ion-item lines="none" class="ion-margin-bottom">
+            <ion-label>Date:</ion-label>
+            <ion-datetime-button slot="end" datetime="datetime"></ion-datetime-button>
+          </ion-item>
+          <ion-modal id="date-modal" keepContentsMounted="true">
+            <ng-template>
+              <ion-content>
+                <ion-datetime
+                  id="datetime"
+                  presentation="date"
+                  min="2023-06-01"
+                  max="2069-06-01"
+                  formControlName="date"
+                ></ion-datetime>
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+
+          <ion-item>
+            <ion-select formControlName="category" lines="none" class="ion-margin-bottom" placeholder="Select a category">
+              <ion-text slot="label">Category: </ion-text>
+              <ion-select-option value="Groceries">Groceries</ion-select-option>
+              <ion-select-option value="Dining">Dining</ion-select-option>
+              <ion-select-option value="Supplies">Supplies</ion-select-option>
+              <ion-select-option value="Transportation">Transportation</ion-select-option>
+              <ion-select-option value="Entertainment">Entertainment</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+        </form>
 
       </ion-content>
     </ng-template>

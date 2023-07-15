@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { doc, updateDoc, getDoc, Firestore } from '@angular/fire/firestore';
+import { doc, collection, addDoc ,updateDoc, getDoc, Firestore } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 
 @Injectable({
@@ -14,10 +14,32 @@ export class DataService {
     private auth:Auth,
     ) { }
 
+  async getUserUid() {
+    const user:any = this.auth.currentUser;
+    return user.uid;
+  }
+
   async getUserRef() {
     const user:any = this.auth.currentUser;
     const docRef = doc(this.firestore, "users", user.uid);
     return docRef;
+  }
+
+  async addExpense({ name, amount, date, category }: any) {
+    const user:any = this.auth.currentUser;
+    
+    try{
+
+      await addDoc(collection(this.firestore, "users", user.uid, "collection"), {
+        name: name,
+        amount: amount,
+        date: date,
+        category: category
+      });
+
+    } catch(e) {
+
+    }
   }
   
   /*

@@ -52,9 +52,9 @@ export class SignupPage implements OnInit {
 		await loading.present();
 
     try {
-      const user = await this.authService.register(this.credentials.value);
+      const user = await this.authService.register(this.credentials.value); // for auth
 
-      await setDoc(doc(this.firestore, "users", user.user.uid), {
+      await setDoc(doc(this.firestore, "users", user.user.uid), { // for firestore
         email: this.credentials.value.email,
         username: this.credentials.value.username,
         monthlybudget: 1000.0,
