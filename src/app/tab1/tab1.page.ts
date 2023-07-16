@@ -84,7 +84,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
       
       await this.getUserUid();
       await this.getUserFields();
-      if (this.updatedat.toDate().getMonth() != this.parseISOString(this.currISOdate).getMonth()) {
+      if (this.updatedat.toDate().getMonth() != this.dataService.parseISOString(this.currISOdate).getMonth()) {
         this.currenttotal = 0;
         await this.resetTotal();
       }
@@ -179,6 +179,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
       this.currenttotal = this.currenttotal + this.expenseDeets.value.amount;
       this.confirm();
 
+      // update page 1
       let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
       this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
       this.daysleftinmonth = this.getRemainingDays();
@@ -208,11 +209,6 @@ export class Tab1Page implements AfterViewInit, OnInit {
       currenttotal: this.currenttotal + amount,
       updatedat: serverTimestamp()
     });
-  }
-
-  parseISOString(s:string) {
-    let b:any = s.split(/\D+/);
-    return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
   }
 
   cancel() {

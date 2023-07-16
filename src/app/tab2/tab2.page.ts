@@ -1,7 +1,9 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { Chart } from 'chart.js/auto';
+import { IonModal } from '@ionic/angular';
+import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-tab2',
@@ -10,15 +12,44 @@ import { Chart } from 'chart.js/auto';
   standalone: true,
   imports: [IonicModule, ExploreContainerComponent]
 })
-export class Tab2Page implements AfterViewInit {
+export class Tab2Page implements OnInit,AfterViewInit {
 
   @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
 
-  constructor() {}
+  constructor(
+    private dataService: DataService
+  ) {}
+
+  month: number;
+  year: number;
+
+  expense_array: any;
 
   doughnutChart: any;
 
+  @ViewChild(IonModal) modal: IonModal;
+
+  ngOnInit(): void {
+    
+    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    let date = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+
+    let month = this.dataService.parseISOString(date).getMonth();
+    let year = this.dataService.parseISOString(date).getFullYear();
+
+
+    this.dataService.getExpensesByMonth(month,year)
+
+    // create form validators here
+
+  }
+
   ngAfterViewInit() {
+
+    // get current month and year by date()
+
+
+
     this.doughnutChartMethod();
   }
 
@@ -47,6 +78,14 @@ export class Tab2Page implements AfterViewInit {
         }]
       }
     });
+  }
+
+  cancel() {
+    this.modal.dismiss(null, 'cancel');
+  }
+
+  confirm() {
+    this.modal.dismiss(null, 'confirm');
   }
 
 }
