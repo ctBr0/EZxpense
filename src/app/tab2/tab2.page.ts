@@ -4,13 +4,16 @@ import { ExploreContainerComponent } from '../explore-container/explore-containe
 import { Chart } from 'chart.js/auto';
 import { IonModal } from '@ionic/angular';
 import { DataService } from '../services/data.service';
+import { onSnapshot, getCountFromServer} from '@angular/fire/firestore';
+import { CommonModule } from '@angular/common';
+import { query } from 'firebase/firestore';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonicModule, ExploreContainerComponent]
+  imports: [IonicModule, CommonModule, ExploreContainerComponent]
 })
 export class Tab2Page implements OnInit,AfterViewInit {
 
@@ -37,11 +40,10 @@ export class Tab2Page implements OnInit,AfterViewInit {
     let month = this.dataService.parseISOString(date).getMonth();
     let year = this.dataService.parseISOString(date).getFullYear();
 
+    this.expense_array = this.getExpenseArrayByMonth(5,month,year)
 
-    this.dataService.getExpensesByMonth(month,year)
-
-    // create form validators here
-
+    // this.expense_array = this.getExpenseArrayByMonth(2, month, year);
+    
   }
 
   ngAfterViewInit() {
@@ -78,6 +80,48 @@ export class Tab2Page implements OnInit,AfterViewInit {
         }]
       }
     });
+  }
+
+  getExpenseArrayByMonth(amount:number, month:number, year:number) {
+
+    const q:any = this.dataService.queryExpensesByMonth(month, year);
+    const array:any = [];
+
+    /*
+    const snapshot = getCountFromServer(q);
+
+    if (snapshot.data().count < amount) {
+      amount = snapshot.data().count;
+    }
+    */
+    onSnapshot(q, (querySnapshot:any) => {
+
+      /*
+      querySnapshot.forEach((doc:any) => {
+          array.push(doc.data());
+      });
+      */
+      
+      // get doc.date().name
+
+      /*
+      for (let i = 0; i < amount; i++) {
+      array.push(querySnapshot.docs[i].data())
+      }
+      */
+
+      if (querySnapshot.size < amount) {
+        amount = querySnapshot.size;
+      }
+
+      for (let i = 0; i < amount; i++) {
+        array.push(querySnapshot.docs[i].data())
+      }
+
+    });
+
+    return array;
+
   }
 
   cancel() {

@@ -52,21 +52,19 @@ export class DataService {
     }
   }
 
-  async getExpensesByMonth( month:number, year:number) {
+  queryExpensesByMonth(month:number, year:number) {
+
     const user:any = this.auth.currentUser;
 
     try {
 
       const q = query(collection(this.firestore, "users", user.uid, "expenses"), where("month", "==", month), where("year", "==", year));
+      // return (await getDocs(q));
 
-      const querySnapshot = await getDocs(q);
-      
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
-      });
+      return q;
 
     } catch(e) {
-
+      return null;
     }
   }
 
