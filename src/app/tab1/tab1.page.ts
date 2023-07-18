@@ -41,9 +41,8 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
   @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
   @ViewChild(IonModal) modal: IonModal;
-  
-  ngOnInit() {
 
+  ionViewWillEnter() {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
     this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
 
@@ -53,23 +52,9 @@ export class Tab1Page implements AfterViewInit, OnInit {
       date: [this.currISOdate, [Validators.required]],
       category: ['', [Validators.required]]
 	  });
-
   }
-
-  get name() {
-    return this.expenseDeets.get('name');
-  }
-
-  get amount() {
-    return this.expenseDeets.get('amount');
-  }
-
-  get date() {
-    return this.expenseDeets.get('date');
-  }
-
-  get category() {
-    return this.expenseDeets.get('category');
+  
+  ngOnInit() {
   }
 
   ngAfterViewInit() {
@@ -82,10 +67,10 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
     try {
       
-      await this.getUserUid();
       await this.getUserFields();
 
-      if (this.updatedat.toDate().getMonth() != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
+      // serverTimestamp must be converted to date to extract month
+      if ((this.updatedat.toDate().getMonth()+1) != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
         this.currenttotal = 0;
         await this.resetTotal();
       }
@@ -120,10 +105,6 @@ export class Tab1Page implements AfterViewInit, OnInit {
         }]
       }
     });
-  }
-
-  async getUserUid() {
-    this.uid = await this.dataService.getUserUid();
   }
 
   async getUserFields() {
@@ -220,6 +201,22 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
   confirm() {
     this.modal.dismiss(null, 'confirm');
+  }
+
+  get name() {
+    return this.expenseDeets.get('name');
+  }
+
+  get amount() {
+    return this.expenseDeets.get('amount');
+  }
+
+  get date() {
+    return this.expenseDeets.get('date');
+  }
+
+  get category() {
+    return this.expenseDeets.get('category');
   }
 
 }

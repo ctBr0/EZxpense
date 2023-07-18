@@ -59,7 +59,6 @@ export class SignupPage implements OnInit {
         username: this.credentials.value.username,
         monthlybudget: 1000.0,
         currenttotal: 0.0,
-        expensecount: 0,
         updatedat: serverTimestamp()
       });
 

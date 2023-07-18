@@ -6,7 +6,7 @@ import { IonModal } from '@ionic/angular';
 import { DataService } from '../services/data.service';
 import { onSnapshot, getCountFromServer} from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
-import { query } from 'firebase/firestore';
+import { LoadingController, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab2',
@@ -20,7 +20,9 @@ export class Tab2Page implements OnInit,AfterViewInit {
   @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
 
   constructor(
-    private dataService: DataService
+    private dataService: DataService,
+    private loadingController: LoadingController,
+    private alertController: AlertController
   ) {}
 
   month: number;
@@ -59,7 +61,7 @@ export class Tab2Page implements OnInit,AfterViewInit {
         labels: ['BJP', 'Congress', 'AAP', 'CPM', 'SP'],
         datasets: [{
           label: '# of Votes',
-          data: [50, 29, 15, 10, 7],
+          data: [20, 29, 15, 10, 7],
           backgroundColor: [
             'rgba(255, 159, 64, 0.2)',
             'rgba(255, 99, 132, 0.2)',
@@ -95,6 +97,48 @@ export class Tab2Page implements OnInit,AfterViewInit {
     return array;
 
   }
+
+  /*
+  async deleteExpense() {
+
+    const loading = await this.loadingController.create();
+    await loading.present();
+
+    try {
+      await this.dataService.deleteExpense();
+      await loading.dismiss();
+    } catch(e) {
+      await loading.dismiss();
+    }
+
+  }
+  */
+
+  /*
+  async deleteAlert(item:any, slidingItem:any) {
+
+    const alert = await this.alertController.create({
+      // header: 
+      message: "Are you sure you want to delete this entry?",
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Yes',
+          role: 'confirm',
+          handler: () => {
+            this.deleteExpense();
+            slidingItem.close();
+          },
+        }
+      ],
+      backdropDismiss: false
+    });
+    await alert.present();
+  }
+  */
 
   cancel() {
     this.modal.dismiss(null, 'cancel');

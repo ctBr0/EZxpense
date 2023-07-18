@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { doc, query, getDocs, setDoc, collection, addDoc, limit, where ,updateDoc, getDoc, Firestore, orderBy } from '@angular/fire/firestore';
+import { doc, query, deleteDoc, getDocs, setDoc, collection, addDoc, limit, where ,updateDoc, getDoc, Firestore, orderBy } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { serverTimestamp } from '@angular/fire/firestore';
 
@@ -29,13 +29,12 @@ export class DataService {
   async addExpense({ name, amount, date, category }: any) {
     const user:any = this.auth.currentUser;
     const docRef = doc(this.firestore, "users", user.uid);
-    const expense_count:number = (await getDoc(docRef)).get('expensecount');
     
     try {
 
       const [day, month, year, time] = this.parseIsoDateString(date);
 
-      await setDoc(doc(this.firestore, "users", user.uid, "expenses", (expense_count+1).toString()), {
+      await addDoc(collection(this.firestore, "users", user.uid, "expenses"), {
         name: name,
         amount: amount,
         year: year,
@@ -43,11 +42,6 @@ export class DataService {
         day: day,
         time: time,
         category: category
-      });
-
-      await updateDoc(docRef, {
-        expensecount: expense_count + 1,
-        updatedat: serverTimestamp()
       });
 
     } catch(e) {
@@ -63,7 +57,6 @@ export class DataService {
       
       const col = collection(this.firestore, "users", user.uid, "expenses");
       const q = query(col, where("month", "==", month), where("year", "==", year), orderBy("day", "desc"), orderBy("time", "desc"), limit(amount));
-      // return (await getDocs(q));
 
       return q;
 
@@ -71,6 +64,14 @@ export class DataService {
       return null;
     }
   }
+
+  /*
+  async deleteExpense() {
+    const user:any = this.auth.currentUser;
+
+    await deleteDoc(doc(this.firestore, "users", user.uid, "expenses", ));
+  }
+  */
 
   parseIsoDateString(isoDateString: string): [number, number, number, string] {
 
