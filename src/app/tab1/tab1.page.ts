@@ -84,7 +84,8 @@ export class Tab1Page implements AfterViewInit, OnInit {
       
       await this.getUserUid();
       await this.getUserFields();
-      if (this.updatedat.toDate().getMonth() != this.dataService.parseISOString(this.currISOdate).getMonth()) {
+
+      if (this.updatedat.toDate().getMonth() != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
         this.currenttotal = 0;
         await this.resetTotal();
       }
@@ -174,7 +175,9 @@ export class Tab1Page implements AfterViewInit, OnInit {
     await loading.present();
 
     try {
+
       await this.dataService.addExpense(this.expenseDeets.value);
+
       await this.updateTotal(this.expenseDeets.value.amount);
       this.currenttotal = this.currenttotal + this.expenseDeets.value.amount;
       this.confirm();

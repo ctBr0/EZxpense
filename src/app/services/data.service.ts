@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { doc, query, getDocs, setDoc, collection, addDoc, where ,updateDoc, getDoc, Firestore } from '@angular/fire/firestore';
+import { doc, query, getDocs, setDoc, collection, addDoc, limit, where ,updateDoc, getDoc, Firestore, orderBy } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { serverTimestamp } from '@angular/fire/firestore';
 
@@ -33,12 +33,15 @@ export class DataService {
     
     try {
 
+      const [day, month, year, time] = this.parseIsoDateString(date);
+
       await setDoc(doc(this.firestore, "users", user.uid, "expenses", (expense_count+1).toString()), {
         name: name,
         amount: amount,
-        ISOstringDATE: date,
-        year: this.parseISOString(date).getFullYear(),
-        month: this.parseISOString(date).getMonth(), // January gives 0
+        year: year,
+        month: month,
+        day: day,
+        time: time,
         category: category
       });
 
@@ -52,13 +55,14 @@ export class DataService {
     }
   }
 
-  queryExpensesByMonth(month:number, year:number) {
+  queryExpensesByMonth(amount:number, month:number, year:number) {
 
     const user:any = this.auth.currentUser;
 
     try {
-
-      const q = query(collection(this.firestore, "users", user.uid, "expenses"), where("month", "==", month), where("year", "==", year));
+      
+      const col = collection(this.firestore, "users", user.uid, "expenses");
+      const q = query(col, where("month", "==", month), where("year", "==", year), orderBy("day", "desc"), orderBy("time", "desc"), limit(amount));
       // return (await getDocs(q));
 
       return q;
@@ -68,16 +72,31 @@ export class DataService {
     }
   }
 
-  parseISOString(s:string) {
-    let b:any = s.split(/\D+/);
-    return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+  parseIsoDateString(isoDateString: string): [number, number, number, string] {
+
+    const [datePart, timePart] = isoDateString.split('T');
+    const [year, month, day] = datePart.split('-');
+    const time = timePart.slice(0, -1);
+
+    return [Number(day), Number(month), Number(year), time];
   }
-  
-  /*
-  getUserExpensesDueInSameMonth(username)
-  {
-    const billRef = collection(this.firestore, 'bill'); 
-    return collectionData(billRef);
+
+  parseIsoDateStringMonth(isoDateString: string): number {
+
+    const [datePart, timePart] = isoDateString.split('T');
+    const [year, month, day] = datePart.split('-');
+    // const time = timePart.slice(0, -1);
+
+    return Number(month);
   }
-  */
+
+  parseIsoDateStringYear(isoDateString: string): number {
+
+    const [datePart, timePart] = isoDateString.split('T');
+    const [year, month, day] = datePart.split('-');
+    // const time = timePart.slice(0, -1);
+
+    return Number(year);
+  }
+
 }

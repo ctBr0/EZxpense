@@ -32,25 +32,22 @@ export class Tab2Page implements OnInit,AfterViewInit {
 
   @ViewChild(IonModal) modal: IonModal;
 
-  ngOnInit(): void {
-    
+  ionViewWillEnter() {
+
     let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
     let date = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
 
-    let month = this.dataService.parseISOString(date).getMonth();
-    let year = this.dataService.parseISOString(date).getFullYear();
+    let month = this.dataService.parseIsoDateStringMonth(date);
+    let year = this.dataService.parseIsoDateStringYear(date);
 
     this.expense_array = this.getExpenseArrayByMonth(5,month,year)
+  }
 
-    // this.expense_array = this.getExpenseArrayByMonth(2, month, year);
+  ngOnInit(): void {
     
   }
 
   ngAfterViewInit() {
-
-    // get current month and year by date()
-
-
 
     this.doughnutChartMethod();
   }
@@ -84,39 +81,14 @@ export class Tab2Page implements OnInit,AfterViewInit {
 
   getExpenseArrayByMonth(amount:number, month:number, year:number) {
 
-    const q:any = this.dataService.queryExpensesByMonth(month, year);
+    const q:any = this.dataService.queryExpensesByMonth(amount, month, year);
     const array:any = [];
 
-    /*
-    const snapshot = getCountFromServer(q);
-
-    if (snapshot.data().count < amount) {
-      amount = snapshot.data().count;
-    }
-    */
     onSnapshot(q, (querySnapshot:any) => {
 
-      /*
       querySnapshot.forEach((doc:any) => {
-          array.push(doc.data());
+        array.push(doc.data());
       });
-      */
-      
-      // get doc.date().name
-
-      /*
-      for (let i = 0; i < amount; i++) {
-      array.push(querySnapshot.docs[i].data())
-      }
-      */
-
-      if (querySnapshot.size < amount) {
-        amount = querySnapshot.size;
-      }
-
-      for (let i = 0; i < amount; i++) {
-        array.push(querySnapshot.docs[i].data())
-      }
 
     });
 
