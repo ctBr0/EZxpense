@@ -55,7 +55,6 @@ export class SignupPage implements OnInit {
       const user = await this.authService.register(this.credentials.value); // for auth
 
       await setDoc(doc(this.firestore, "users", user.user.uid), { // for firestore
-        email: this.credentials.value.email,
         username: this.credentials.value.username,
         monthlybudget: 1000.0,
         currenttotal: 0.0,

@@ -19,7 +19,6 @@ import { getDoc, serverTimestamp, updateDoc } from '@angular/fire/firestore';
 export class Tab3Page implements OnInit{
   
   username:string;
-  email:string;
   monthlybudget:number;
   currenttotal:number;
   updatedat:any;
@@ -79,7 +78,6 @@ export class Tab3Page implements OnInit{
 
       const docSnap = await getDoc(await this.dataService.getUserRef());
       this.username = docSnap.get('username');
-      this.email = docSnap.get('email');
       this.monthlybudget= docSnap.get('monthlybudget');
       this.currenttotal = docSnap.get('currenttotal');
       this.updatedat = docSnap.get('updatedat');

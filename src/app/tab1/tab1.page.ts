@@ -20,7 +20,6 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
   uid:string;
   username:string;
-  email:string;
   monthlybudget:number;
   currenttotal:number;
   updatedat:any;
@@ -116,7 +115,6 @@ export class Tab1Page implements AfterViewInit, OnInit {
  
       const docSnap = await getDoc(await this.dataService.getUserRef());
       this.username = docSnap.get('username');
-      this.email = docSnap.get('email');
       this.monthlybudget= docSnap.get('monthlybudget');
       this.currenttotal = docSnap.get('currenttotal');
       this.updatedat = docSnap.get('updatedat');
