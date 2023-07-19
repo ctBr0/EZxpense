@@ -159,8 +159,11 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
       await this.dataService.addExpense(this.expenseDeets.value);
 
-      await this.updateTotal(this.expenseDeets.value.amount);
-      this.currenttotal = this.currenttotal + this.expenseDeets.value.amount;
+      if (this.dataService.parseIsoDateStringMonth(this.expenseDeets.value.date) == this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
+        await this.updateTotal(this.expenseDeets.value.amount);
+        this.currenttotal = this.currenttotal + this.expenseDeets.value.amount;
+      }
+
       this.confirm();
 
       // update page 1

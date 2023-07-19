@@ -7,61 +7,108 @@ import { DataService } from '../services/data.service';
 import { onSnapshot, getCountFromServer} from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IonDatetime } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, ExploreContainerComponent]
+  imports: [IonicModule, CommonModule, ExploreContainerComponent, FormsModule, ReactiveFormsModule]
 })
-export class Tab2Page implements OnInit,AfterViewInit {
-
-  @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
+export class Tab2Page implements OnInit {
 
   constructor(
+    // private fb: FormBuilder,
     private dataService: DataService,
-    private loadingController: LoadingController,
-    private alertController: AlertController
+    private loadingController: LoadingController
   ) {}
 
-  month: number;
-  year: number;
+  currISOdate: any;
 
   expense_array: any;
 
+  // monthForm: FormGroup;
+
   doughnutChart: any;
 
+  @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
   @ViewChild(IonModal) modal: IonModal;
-
-  ionViewWillEnter() {
-
-    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-    let date = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
-
-    let month = this.dataService.parseIsoDateStringMonth(date);
-    let year = this.dataService.parseIsoDateStringYear(date);
-
-    this.expense_array = this.getExpenseArrayByMonth(5,month,year)
-  }
+  // @ViewChild(IonDatetime) datetime: IonDatetime;
 
   ngOnInit(): void {
+
+    // must be in ngoninit
+    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+    /*
+    this.monthForm = this.fb.group({
+      month: [this.currISOdate, [Validators.required]]
+	  });
+    */
+
+  }
+
+  ionViewWillEnter() {
+    this.start()
+  }
+
+  ionViewWillLeave() {
+    this.doughnutChart.destroy();
+  }
+  
+  async updateChart(ev: any) {
+
+    const loading = await this.loadingController.create();
+		await loading.present();
+
+    this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(ev.detail.value),this.dataService.parseIsoDateStringYear(ev.detail.value));
+    this.doughnutChart.update();
+
+    await loading.dismiss()
+
+    // this.datetime.confirm(true);
+    /*
+    console.log(this.monthForm.value.month)
+    this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.monthForm.value.month),this.dataService.parseIsoDateStringYear(this.monthForm.value.month));
+    console.log(this.doughnutChart.data.datasets[0].data)
+
+    await this.doughnutChart.update();
+    */
+  }
+  
+
+  async start() {
+
+    const loading = await this.loadingController.create();
+		await loading.present();
+
+    // recent expenses
+    const month = this.dataService.parseIsoDateStringMonth(this.currISOdate);
+    const year = this.dataService.parseIsoDateStringYear(this.currISOdate);
+
+    this.expense_array = this.getExpenseArrayByMonth(5,month,year);
     
+    // category chart
+    await this.doughnutChartMethod();
+
+    await loading.dismiss()
   }
 
-  ngAfterViewInit() {
+  async doughnutChartMethod() {
+    // query values from database
+    // const [groceriesC, diningC, suppliesC, transportationC, entertainmentC]:any = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.monthForm.value.month),this.dataService.parseIsoDateStringYear(this.monthForm.value.month));
+    const [groceriesC, diningC, suppliesC, transportationC, entertainmentC]:any = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.currISOdate),this.dataService.parseIsoDateStringYear(this.currISOdate));
 
-    this.doughnutChartMethod();
-  }
-
-  doughnutChartMethod() {
+    // create the chart
     this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, {
       type: 'doughnut',
       data: {
-        labels: ['BJP', 'Congress', 'AAP', 'CPM', 'SP'],
+        labels: ['Groceries', 'Dining', 'Supplies', 'Transportation', 'Entertainment'],
         datasets: [{
-          label: '# of Votes',
-          data: [20, 29, 15, 10, 7],
+          label: 'Amount',
+          data: [groceriesC, diningC, suppliesC, transportationC, entertainmentC],
           backgroundColor: [
             'rgba(255, 159, 64, 0.2)',
             'rgba(255, 99, 132, 0.2)',
@@ -97,6 +144,12 @@ export class Tab2Page implements OnInit,AfterViewInit {
     return array;
 
   }
+
+  /*
+  get month() {
+    return this.monthForm.get('month');
+  }
+  */
 
   /*
   async deleteExpense() {
@@ -140,6 +193,7 @@ export class Tab2Page implements OnInit,AfterViewInit {
   }
   */
 
+  /*
   cancel() {
     this.modal.dismiss(null, 'cancel');
   }
@@ -147,5 +201,6 @@ export class Tab2Page implements OnInit,AfterViewInit {
   confirm() {
     this.modal.dismiss(null, 'confirm');
   }
+  */
 
 }

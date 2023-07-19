@@ -3,59 +3,75 @@
 
 <ion-content [fullscreen]="true">
 
+    <ion-card>
+      <ion-card-header class="ion-text-center">
+        <ion-card-subtitle>
+          Total expense: $2000
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none" class="ion-margin-bottom">
+          <ion-label>Month:</ion-label>
+          <ion-datetime-button slot="end" datetime="datetime"></ion-datetime-button>
+        </ion-item>
+        
+        <ion-modal id="month-modal" keepContentsMounted="true">
+        
+          <ng-template>
 
+              <ion-content>
 
-  <ion-card>
-    <ion-card-header>
-      Total expense: $2000
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item lines="none" class="ion-margin-bottom">
-        <ion-label>Month:</ion-label>
-        <ion-datetime-button slot="end" datetime="datetime"></ion-datetime-button>
-      </ion-item>
-      <ion-modal id="month-modal" keepContentsMounted="true">
-        <ng-template>
-          <ion-content>
-            <ion-datetime
-              id="datetime"
-              presentation="month-year"
-              min="2023-06"
-              max="2069-12"
-            ></ion-datetime>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-      <canvas #doughnutCanvas style="position: relative; height:20vh; width:40vw"></canvas>
-    </ion-card-content>
-  </ion-card>
+                <ion-datetime #datetime
+                  id="datetime"
+                  presentation="month-year"
+                  min="2023-06"
+                  max="2069-12"
 
-  <ion-card>
-    <ion-card-header>
-      Recent expenses
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>  
+                  (ionChange)="updateChart($event)"
+                >
+                  <!--
+                  <ion-buttons slot="buttons">
+                    <ion-button color="primary" (click)="datetime.cancel(true)">Never mind</ion-button>
+                    <ion-button color="primary" (click)="updateChart()">All Set</ion-button>
+                  </ion-buttons>
+                  -->
+                </ion-datetime>
 
-        <!--
-        <ion-item-sliding #slidingItem *ngFor="let item of this.expense_array">
-      
-          <ion-item>
+              </ion-content>
+
+          </ng-template>
+        </ion-modal>
+        <canvas #doughnutCanvas style="position: relative; height:20vh; width:40vw"></canvas>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        Recent expenses
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>  
+
+          <!--
+          <ion-item-sliding #slidingItem *ngFor="let item of this.expense_array">
+        
+            <ion-item>
+              <ion-label>{{item.name + ": $" + item.amount}}</ion-label>
+            </ion-item>
+        
+            <ion-item-options (click)="deleteAlert(item, slidingItem)" side="end">
+              <ion-item-option color="danger" >Delete</ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+          -->
+
+          <ion-item *ngFor="let item of this.expense_array">
             <ion-label>{{item.name + ": $" + item.amount}}</ion-label>
           </ion-item>
-      
-          <ion-item-options (click)="deleteAlert(item, slidingItem)" side="end">
-            <ion-item-option color="danger" >Delete</ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-        -->
 
-        <ion-item *ngFor="let item of this.expense_array">
-          <ion-label>{{item.name + ": $" + item.amount}}</ion-label>
-        </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
 
 </ion-content>
