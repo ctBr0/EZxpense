@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { Chart } from 'chart.js/auto';
@@ -37,11 +37,13 @@ export class Tab2Page implements OnInit {
   // @ViewChild(IonModal) modal: IonModal;
   // @ViewChild(IonDatetime) datetime: IonDatetime;
 
-  ngOnInit(): void {
+  async ngOnInit() {
 
     // must be in ngoninit
-    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-    this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+    const loading = await this.loadingController.create();
+		await loading.present();
+
+    this.currISOdate = this.dataService.getCurrIsoDate();
     /*
     this.monthForm = this.fb.group({
       month: [this.currISOdate, [Validators.required]]

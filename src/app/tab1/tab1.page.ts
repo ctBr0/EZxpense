@@ -1,11 +1,11 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { Chart } from 'chart.js/auto';
 import { IonModal } from '@ionic/angular';
 import { LoadingController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
-import { getDoc, serverTimestamp, Timestamp, updateDoc } from '@angular/fire/firestore';
+import { getDoc, serverTimestamp, updateDoc } from '@angular/fire/firestore';
 import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
@@ -48,7 +48,7 @@ export class Tab1Page implements OnInit {
     const loading = await this.loadingController.create();
 		await loading.present();
 
-    this.getCurrIsoDate();
+    this.currISOdate = this.dataService.getCurrIsoDate();
     this.expenseDeets = this.fb.group({
       name: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.min(1)]],
@@ -99,24 +99,30 @@ export class Tab1Page implements OnInit {
   }
 
   async updatePage() {
-    // update current ISO time
-    this.getCurrIsoDate();
-    console.log(this.currISOdate);
 
-    // check if it is a new month
-    if ((this.updatedAt.toDate().getMonth()+1) != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
-      this.currentTotal = 0;
-      await this.resetTotal();
+    try {
+      // update current ISO time
+      this.currISOdate = this.dataService.getCurrIsoDate();
+      console.log(this.currISOdate);
+
+      // check if it is a new month
+      if ((this.updatedAt.toDate().getMonth()+1) != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
+        this.currentTotal = 0;
+        await this.resetTotal();
+      }
+
+      // get remaining days in month
+      this.daysLeftInMonth = this.getRemainingDays();
+
+      // check for budget status
+      this.status = this.currentTotal > this.monthlyBudget ? "Budget exceeded" : "Within budget";
+    } catch(e){
+
     }
 
-    // get remaining days in month
-    this.daysLeftInMonth = this.getRemainingDays();
-
-    // check for budget status
-    this.status = this.currentTotal > this.monthlyBudget ? "Budget exceeded" : "Within budget";
   }
 
-  doughnutChartMethod() {
+  doughnutChartMethod(): void {
     this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, {
       type: 'doughnut',
       data: {
@@ -149,11 +155,14 @@ export class Tab1Page implements OnInit {
   }
 
   async resetTotal() {
-    const docRef = await this.dataService.getUserRef();
-    await updateDoc(docRef, {
-      currentTotal: 0,
-      updatedAt: serverTimestamp()
-    });
+    try {
+      const docRef = await this.dataService.getUserRef();
+      await updateDoc(docRef, {
+        currentTotal: 0,
+        updatedAt: serverTimestamp()
+      });
+    } catch(e) {
+    }
   }
 
   getRemainingDays() {
@@ -177,8 +186,10 @@ export class Tab1Page implements OnInit {
 
     try {
 
+      // add expense to database
       await this.dataService.addExpense(this.expenseDeets.value);
 
+      // update total expense amount
       if (this.dataService.parseIsoDateStringMonth(this.expenseDeets.value.date) == this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
         await this.updateTotal(this.expenseDeets.value.amount);
         this.currentTotal = this.currentTotal + this.expenseDeets.value.amount;
@@ -200,16 +211,14 @@ export class Tab1Page implements OnInit {
   }
 
   async updateTotal(amount:number) {
-    const docRef = await this.dataService.getUserRef();
-    await updateDoc(docRef, {
-      currentTotal: this.currentTotal + amount,
-      updatedAt: serverTimestamp()
-    });
-  }
-
-  getCurrIsoDate(): void {
-    const tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-    this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+    try {
+      const docRef = await this.dataService.getUserRef();
+      await updateDoc(docRef, {
+        currentTotal: this.currentTotal + amount,
+        updatedAt: serverTimestamp()
+      });
+    } catch(e) {
+    }
   }
 
   cancel() {

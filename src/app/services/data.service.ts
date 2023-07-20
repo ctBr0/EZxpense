@@ -48,6 +48,11 @@ export class DataService {
     }
   }
 
+  getCurrIsoDate() {
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    return (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+  }
+
   queryExpensesByMonth(amount:number, month:number, year:number) {
 
     const user:any = this.auth.currentUser;
