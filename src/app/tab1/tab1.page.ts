@@ -187,7 +187,7 @@ export class Tab1Page implements OnInit {
     await loading.present();
 
     try {
-
+      
       // add expense to database
       await this.dataService.addExpense(this.expenseDeets.value);
 
@@ -200,6 +200,7 @@ export class Tab1Page implements OnInit {
       this.confirm();
 
       await this.updatePage();
+      this.expenseDeets.value.date = this.currISOdate;
 
       // update the chart
       this.doughnutChart.data.datasets[0].data = [this.currentTotal,(this.monthlyBudget-this.currentTotal)];

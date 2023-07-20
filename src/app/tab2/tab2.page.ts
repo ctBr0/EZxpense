@@ -20,38 +20,25 @@ import { IonDatetime } from '@ionic/angular';
 export class Tab2Page implements OnInit {
 
   constructor(
-    // private fb: FormBuilder,
     private dataService: DataService,
     private loadingController: LoadingController
   ) {}
   
+  // local varaibles
   month: any;
   year: any;
   currISOdate: any;
-
   expense_array: any;
-
-  // monthForm: FormGroup;
-
   doughnutChart: any;
 
   @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
-  // @ViewChild(IonModal) modal: IonModal;
-  // @ViewChild(IonDatetime) datetime: IonDatetime;
 
   async ngOnInit() {
 
     this.currISOdate = this.dataService.getCurrIsoDate();
 
-    // must be in ngoninit
     const loading = await this.loadingController.create();
 		await loading.present();
-
-    /*
-    this.monthForm = this.fb.group({
-      month: [this.currISOdate, [Validators.required]]
-	  });
-    */
 
     try {
 
@@ -71,12 +58,25 @@ export class Tab2Page implements OnInit {
 
   }
 
-  /*
   async ionViewWillEnter() {
+
+    this.currISOdate = this.dataService.getCurrIsoDate();
+
     const loading = await this.loadingController.create();
 		await loading.present();
 
     try {
+
+      // recent expenses
+      this.month = this.dataService.parseIsoDateStringMonth(this.currISOdate);
+      this.year = this.dataService.parseIsoDateStringYear(this.currISOdate);
+      this.expense_array = this.getExpenseArrayByMonth(5,this.month,this.year);
+
+      // update category chart
+      this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.currISOdate),this.dataService.parseIsoDateStringYear(this.currISOdate));
+      this.doughnutChart.update();
+
+      await loading.dismiss();
 
     } catch(e) {
 
@@ -85,35 +85,16 @@ export class Tab2Page implements OnInit {
     await loading.dismiss()
 
   }
-  */
 
-  /*
-  ionViewWillLeave() {
-    // this.doughnutChart.destroy();
-  }
-  */
-  
   // called by ionchange()
   async updateChart(ev: any) {
-    console.log(this.currISOdate)
+    // update category chart
     this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(ev.detail.value),this.dataService.parseIsoDateStringYear(ev.detail.value));
     this.doughnutChart.update();
-
-
-
-    // this.datetime.confirm(true);
-    /*
-    console.log(this.monthForm.value.month)
-    this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.monthForm.value.month),this.dataService.parseIsoDateStringYear(this.monthForm.value.month));
-    console.log(this.doughnutChart.data.datasets[0].data)
-
-    await this.doughnutChart.update();
-    */
   }
 
   async doughnutChartMethod() {
     // query values from database
-    // const [groceriesC, diningC, suppliesC, transportationC, entertainmentC]:any = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.monthForm.value.month),this.dataService.parseIsoDateStringYear(this.monthForm.value.month));
     const [groceriesC, diningC, suppliesC, transportationC, entertainmentC]:any = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.currISOdate),this.dataService.parseIsoDateStringYear(this.currISOdate));
 
     // create the chart
@@ -159,63 +140,5 @@ export class Tab2Page implements OnInit {
     return array;
 
   }
-
-  /*
-  get month() {
-    return this.monthForm.get('month');
-  }
-  */
-
-  /*
-  async deleteExpense() {
-
-    const loading = await this.loadingController.create();
-    await loading.present();
-
-    try {
-      await this.dataService.deleteExpense();
-      await loading.dismiss();
-    } catch(e) {
-      await loading.dismiss();
-    }
-
-  }
-  */
-
-  /*
-  async deleteAlert(item:any, slidingItem:any) {
-
-    const alert = await this.alertController.create({
-      // header: 
-      message: "Are you sure you want to delete this entry?",
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Yes',
-          role: 'confirm',
-          handler: () => {
-            this.deleteExpense();
-            slidingItem.close();
-          },
-        }
-      ],
-      backdropDismiss: false
-    });
-    await alert.present();
-  }
-  */
-
-  /*
-  cancel() {
-    this.modal.dismiss(null, 'cancel');
-  }
-
-  confirm() {
-    this.modal.dismiss(null, 'confirm');
-  }
-  */
 
 }
