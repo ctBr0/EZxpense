@@ -3,6 +3,7 @@
 
 <ion-content [fullscreen]="true">
 
+  <!--
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content
       pullingIcon="chevron-down-circle-outline"
@@ -12,6 +13,7 @@
     >
     </ion-refresher-content>
   </ion-refresher>
+  -->
   
   <ion-card>
     <ion-card-header class="ion-text-center">
@@ -41,7 +43,7 @@
                   <ion-card-content>
 
                     <form [formGroup]="formG" (ngSubmit)="updateBudget(this.formG.value.budget)">
-                      <ion-input type="number" formControlName="budget" helperText="Must be a number greater or equal to 1000" errorText="Must be a number greater or equal to 1000" placeholder="Current amount: ${{monthlybudget}}"></ion-input>
+                      <ion-input type="number" formControlName="budget" helperText="Must be a number greater or equal to 1000" errorText="Must be a number greater or equal to 1000"></ion-input>
                       <ion-button type="submit" expand="block" [disabled]="!formG.valid" (click)="confirm()">Confirm</ion-button>
                       <ion-button type="button" expand="block" fill="clear" (click)="cancel()">Back</ion-button>
                     </form>

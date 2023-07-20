@@ -141,4 +141,11 @@ export class Tab2Page implements OnInit {
 
   }
 
+  async handleRefresh(event:any) {
+    setTimeout(() => {
+      this.ionViewWillEnter();
+      event.target.complete();
+    }, 2000);
+  }
+
 }

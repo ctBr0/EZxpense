@@ -18,11 +18,6 @@ import { getDoc, serverTimestamp, updateDoc } from '@angular/fire/firestore';
 })
 export class Tab3Page implements OnInit{
   
-  username:string;
-  monthlybudget:number;
-  currenttotal:number;
-  updatedat:any;
-
   formG: FormGroup;
   
   constructor(
@@ -31,9 +26,9 @@ export class Tab3Page implements OnInit{
     private router: Router,
     private dataService: DataService,
     private loadingController: LoadingController
-  ) { 
-    this.getUserFields();
-  }
+  ) { }
+
+  @ViewChild(IonModal) modal: IonModal;
 
   ngOnInit() {
     this.formG = this.fb.group({
@@ -41,11 +36,15 @@ export class Tab3Page implements OnInit{
 	  });
   }
 
+  /*
+  async ionViewWillEnter() {
+
+  }
+  */
+
 	get budget() {
 		return this.formG.get('budget');
 	}
-
-  @ViewChild(IonModal) modal: IonModal;
 
   async logout() {
     await this.authService.logout();
@@ -70,30 +69,27 @@ export class Tab3Page implements OnInit{
     }
   }
 
+  /*
   async getUserFields() {
-    const loading = await this.loadingController.create();
-		await loading.present();
-
     try {
-
       const docSnap = await getDoc(await this.dataService.getUserRef());
       this.username = docSnap.get('username');
-      this.monthlybudget= docSnap.get('monthlybudget');
-      this.currenttotal = docSnap.get('currenttotal');
-      this.updatedat = docSnap.get('updatedat');
-      await loading.dismiss();
-
+      this.monthlybudget= docSnap.get('monthlyBudget');
+      this.currenttotal = docSnap.get('currentTotal');
+      this.updatedat = docSnap.get('updatedAt');
     } catch (e) {
-      await loading.dismiss();
     }
   }
+  */
 
+  /*
   handleRefresh(event:any) {
     setTimeout(() => {
-      this.getUserFields();
+      this.ionViewWillEnter();
       event.target.complete();
     }, 2000);
   }
+  */
   
   public alertButtons = [
     {
