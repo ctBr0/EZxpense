@@ -4,9 +4,9 @@ import { ExploreContainerComponent } from '../explore-container/explore-containe
 import { Chart } from 'chart.js/auto';
 import { IonModal } from '@ionic/angular';
 import { DataService } from '../services/data.service';
-import { onSnapshot, getCountFromServer} from '@angular/fire/firestore';
+import { onSnapshot } from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonDatetime } from '@ionic/angular';
 
@@ -24,7 +24,9 @@ export class Tab2Page implements OnInit {
     private dataService: DataService,
     private loadingController: LoadingController
   ) {}
-
+  
+  month: any;
+  year: any;
   currISOdate: any;
 
   expense_array: any;
@@ -39,37 +41,65 @@ export class Tab2Page implements OnInit {
 
   async ngOnInit() {
 
+    this.currISOdate = this.dataService.getCurrIsoDate();
+
     // must be in ngoninit
     const loading = await this.loadingController.create();
 		await loading.present();
 
-    this.currISOdate = this.dataService.getCurrIsoDate();
     /*
     this.monthForm = this.fb.group({
       month: [this.currISOdate, [Validators.required]]
 	  });
     */
 
-  }
+    try {
 
-  ionViewWillEnter() {
-    this.start()
-  }
+      // recent expenses
+      this.month = this.dataService.parseIsoDateStringMonth(this.currISOdate);
+      this.year = this.dataService.parseIsoDateStringYear(this.currISOdate);
+      this.expense_array = this.getExpenseArrayByMonth(5,this.month,this.year);
+      
+      // category chart
+      await this.doughnutChartMethod();
 
-  ionViewWillLeave() {
-    this.doughnutChart.destroy();
-  }
+      await loading.dismiss();
   
-  // called by ionchange()
-  async updateChart(ev: any) {
+    } catch(e) {
+      await loading.dismiss();
+    }
 
+  }
+
+  /*
+  async ionViewWillEnter() {
     const loading = await this.loadingController.create();
 		await loading.present();
 
+    try {
+
+    } catch(e) {
+
+    }
+
+    await loading.dismiss()
+
+  }
+  */
+
+  /*
+  ionViewWillLeave() {
+    // this.doughnutChart.destroy();
+  }
+  */
+  
+  // called by ionchange()
+  async updateChart(ev: any) {
+    console.log(this.currISOdate)
     this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(ev.detail.value),this.dataService.parseIsoDateStringYear(ev.detail.value));
     this.doughnutChart.update();
 
-    await loading.dismiss()
+
 
     // this.datetime.confirm(true);
     /*
@@ -79,24 +109,6 @@ export class Tab2Page implements OnInit {
 
     await this.doughnutChart.update();
     */
-  }
-  
-
-  async start() {
-
-    const loading = await this.loadingController.create();
-		await loading.present();
-
-    // recent expenses
-    const month = this.dataService.parseIsoDateStringMonth(this.currISOdate);
-    const year = this.dataService.parseIsoDateStringYear(this.currISOdate);
-
-    this.expense_array = this.getExpenseArrayByMonth(5,month,year);
-    
-    // category chart
-    await this.doughnutChartMethod();
-
-    await loading.dismiss()
   }
 
   async doughnutChartMethod() {
