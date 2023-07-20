@@ -34,7 +34,7 @@ export class Tab2Page implements OnInit {
   doughnutChart: any;
 
   @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
-  @ViewChild(IonModal) modal: IonModal;
+  // @ViewChild(IonModal) modal: IonModal;
   // @ViewChild(IonDatetime) datetime: IonDatetime;
 
   ngOnInit(): void {
@@ -58,6 +58,7 @@ export class Tab2Page implements OnInit {
     this.doughnutChart.destroy();
   }
   
+  // called by ionchange()
   async updateChart(ev: any) {
 
     const loading = await this.loadingController.create();

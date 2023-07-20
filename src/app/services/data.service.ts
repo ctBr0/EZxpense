@@ -28,7 +28,6 @@ export class DataService {
 
   async addExpense({ name, amount, date, category }: any) {
     const user:any = this.auth.currentUser;
-    const docRef = doc(this.firestore, "users", user.uid);
     
     try {
 

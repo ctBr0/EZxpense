@@ -16,20 +16,22 @@ import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule} f
   imports: [IonicModule, ExploreContainerComponent, FormsModule, ReactiveFormsModule],
 })
 
-export class Tab1Page implements AfterViewInit, OnInit {
-
+export class Tab1Page implements OnInit {
+  
+  // user uid
   uid:string;
+
+  // users document fields
   username:string;
-  monthlybudget:number;
-  currenttotal:number;
-  updatedat:any;
+  monthlyBudget:number;
+  currentTotal:number;
+  updatedAt:any;
 
+  // local variables
   currISOdate: any;
-  daysleftinmonth:number = this.getRemainingDays();
+  daysLeftInMonth:number;
   status:string;
-
   doughnutChart: any;
-
   expenseDeets: FormGroup;
 
   constructor(
@@ -41,43 +43,54 @@ export class Tab1Page implements AfterViewInit, OnInit {
   @ViewChild('doughnutCanvas') private doughnutCanvas: ElementRef;
   @ViewChild(IonModal) modal: IonModal;
 
-  ionViewWillEnter() {
-    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-    this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+  async ngOnInit() {
 
+    const loading = await this.loadingController.create();
+		await loading.present();
+
+    this.getCurrIsoDate();
     this.expenseDeets = this.fb.group({
       name: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.min(1)]],
       date: [this.currISOdate, [Validators.required]],
       category: ['', [Validators.required]]
 	  });
-  }
-  
-  ngOnInit() {
+
+    try {
+
+      // read data from firestore to initialize user field variables
+      await this.getUserFields();
+
+      // serverTimestamp must be converted to date to extract month
+      // check if it is a new month
+      if ((this.updatedAt.toDate().getMonth()+1) != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
+        this.currentTotal = 0;
+        await this.resetTotal();
+      }
+
+      // initialize doughnut chart
+      this.doughnutChartMethod();
+
+      // get remaining days in month
+      this.daysLeftInMonth = this.getRemainingDays();
+
+      // check for budget status
+      this.status = this.currentTotal > this.monthlyBudget ? "Budget exceeded" : "Within budget";
+
+      loading.dismiss();
+    } catch(e) {
+      loading.dismiss();
+    }
+
   }
 
-  ngAfterViewInit() {
-    this.start();
-  }
-
-  async start() {
+  // fires when the component routing to is about to animate into view
+  async ionViewWillEnter() {
     const loading = await this.loadingController.create();
 		await loading.present();
 
     try {
-      
-      await this.getUserFields();
-
-      // serverTimestamp must be converted to date to extract month
-      if ((this.updatedat.toDate().getMonth()+1) != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
-        this.currenttotal = 0;
-        await this.resetTotal();
-      }
-
-      this.doughnutChartMethod();
-
-      this.status = this.currenttotal > this.monthlybudget ? "Budget exceeded" : "Within budget";
-      
+      await this.updatePage();
       await loading.dismiss();
     } catch(e) {
       await loading.dismiss();
@@ -85,14 +98,32 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
   }
 
-  async doughnutChartMethod() {
+  async updatePage() {
+    // update current ISO time
+    this.getCurrIsoDate();
+    console.log(this.currISOdate);
+
+    // check if it is a new month
+    if ((this.updatedAt.toDate().getMonth()+1) != this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
+      this.currentTotal = 0;
+      await this.resetTotal();
+    }
+
+    // get remaining days in month
+    this.daysLeftInMonth = this.getRemainingDays();
+
+    // check for budget status
+    this.status = this.currentTotal > this.monthlyBudget ? "Budget exceeded" : "Within budget";
+  }
+
+  doughnutChartMethod() {
     this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, {
       type: 'doughnut',
       data: {
         labels: ['Total expenses', 'Remaining balance'],
         datasets: [{
           label: 'Amount',
-          data: [this.currenttotal,(this.monthlybudget-this.currenttotal)],
+          data: [this.currentTotal,(this.monthlyBudget-this.currentTotal)],
           backgroundColor: [
             'rgba(255, 159, 64, 0.2)',
             'rgba(255, 99, 132, 0.2)',
@@ -107,30 +138,21 @@ export class Tab1Page implements AfterViewInit, OnInit {
   }
 
   async getUserFields() {
-
-    const loading = await this.loadingController.create();
-    await loading.present();
-
     try {
- 
       const docSnap = await getDoc(await this.dataService.getUserRef());
       this.username = docSnap.get('username');
-      this.monthlybudget= docSnap.get('monthlybudget');
-      this.currenttotal = docSnap.get('currenttotal');
-      this.updatedat = docSnap.get('updatedat');
-
-      await loading.dismiss();
+      this.monthlyBudget= docSnap.get('monthlyBudget');
+      this.currentTotal = docSnap.get('currentTotal');
+      this.updatedAt = docSnap.get('updatedAt');
     } catch(e) {
-      await loading.dismiss();
     }
-
   }
 
   async resetTotal() {
     const docRef = await this.dataService.getUserRef();
     await updateDoc(docRef, {
-      currenttotal: 0,
-      updatedat: serverTimestamp()
+      currentTotal: 0,
+      updatedAt: serverTimestamp()
     });
   }
 
@@ -142,9 +164,9 @@ export class Tab1Page implements AfterViewInit, OnInit {
     return newDate.getDate() > currDate.getDate() ? newDate.getDate() - currDate.getDate() : 0;
   }
 
-  handleRefresh(event:any) {
+  async handleRefresh(event:any) {
     setTimeout(() => {
-      this.getUserFields();
+      this.ionViewWillEnter();
       event.target.complete();
     }, 2000);
   }
@@ -159,26 +181,15 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
       if (this.dataService.parseIsoDateStringMonth(this.expenseDeets.value.date) == this.dataService.parseIsoDateStringMonth(this.currISOdate)) {
         await this.updateTotal(this.expenseDeets.value.amount);
-        this.currenttotal = this.currenttotal + this.expenseDeets.value.amount;
+        this.currentTotal = this.currentTotal + this.expenseDeets.value.amount;
       }
 
       this.confirm();
 
-      // update page 1
-      let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-      this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
-      this.daysleftinmonth = this.getRemainingDays();
-      this.status = this.currenttotal > this.monthlybudget ? "Budget exceeded" : "Within budget";
-
-      this.expenseDeets = this.fb.group({
-        name: ['', [Validators.required]],
-        amount: ['', [Validators.required, Validators.min(1)]],
-        date: [this.currISOdate, [Validators.required]],
-        category: ['', [Validators.required]]
-      });
+      await this.updatePage();
 
       // update the chart
-      this.doughnutChart.data.datasets[0].data = [this.currenttotal,(this.monthlybudget-this.currenttotal)];
+      this.doughnutChart.data.datasets[0].data = [this.currentTotal,(this.monthlyBudget-this.currentTotal)];
       await this.doughnutChart.update();
 
       await loading.dismiss();
@@ -191,9 +202,14 @@ export class Tab1Page implements AfterViewInit, OnInit {
   async updateTotal(amount:number) {
     const docRef = await this.dataService.getUserRef();
     await updateDoc(docRef, {
-      currenttotal: this.currenttotal + amount,
-      updatedat: serverTimestamp()
+      currentTotal: this.currentTotal + amount,
+      updatedAt: serverTimestamp()
     });
+  }
+
+  getCurrIsoDate(): void {
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    this.currISOdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
   }
 
   cancel() {

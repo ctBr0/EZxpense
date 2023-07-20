@@ -56,9 +56,9 @@ export class SignupPage implements OnInit {
 
       await setDoc(doc(this.firestore, "users", user.user.uid), { // for firestore
         username: this.credentials.value.username,
-        monthlybudget: 1000.0,
-        currenttotal: 0.0,
-        updatedat: serverTimestamp()
+        monthlyBudget: 1000.0,
+        currentTotal: 0.0,
+        updatedAt: serverTimestamp()
       });
 
       await loading.dismiss();
