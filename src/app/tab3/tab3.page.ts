@@ -59,8 +59,8 @@ export class Tab3Page implements OnInit{
       const docRef = await this.dataService.getUserRef();
 
       await updateDoc(docRef, {
-        monthlybudget: budget,
-        updatedat: serverTimestamp()
+        monthlyBudget: budget,
+        updatedAt: serverTimestamp()
       });
 
       await loading.dismiss();

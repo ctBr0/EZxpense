@@ -46,17 +46,16 @@ export class Tab1Page implements OnInit {
   async ngOnInit() {
 
     this.currISOdate = this.dataService.getCurrIsoDate();
-
-    const loading = await this.loadingController.create();
-		await loading.present();
-
-  
+      
     this.expenseDeets = this.fb.group({
       name: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.min(1)]],
       date: [this.currISOdate, [Validators.required]],
       category: ['', [Validators.required]]
 	  });
+
+    const loading = await this.loadingController.create();
+		await loading.present();
 
     try {
 
@@ -92,6 +91,7 @@ export class Tab1Page implements OnInit {
 		await loading.present();
 
     try {
+      await this.getUserFields();
       await this.updatePage();
       await loading.dismiss();
     } catch(e) {
