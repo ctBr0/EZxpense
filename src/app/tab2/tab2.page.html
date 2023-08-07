@@ -51,13 +51,13 @@
   </ion-card>
 
   <ion-card>
-    <ion-card-header>
+    <ion-card-header class="ion-text-center">
       Recent expenses
     </ion-card-header>
     <ion-card-content>
       <ion-list>  
 
-        <ion-item *ngFor="let item of this.expense_array">
+        <ion-item lines="none" *ngFor="let item of this.expense_array">
           <ion-label>{{item.name + ": $" + item.amount}}</ion-label>
         </ion-item>
 
