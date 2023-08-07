@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" id="ion-content-main">
 
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content
@@ -12,20 +12,6 @@
     >
     </ion-refresher-content>
   </ion-refresher>
-
-  <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button>
-      <ion-icon name="add-circle-outline"></ion-icon>
-    </ion-fab-button>
-    <ion-fab-list side="top">
-      <ion-fab-button>
-        <ion-icon name="camera-outline"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button>
-        <ion-icon name="create-outline" id="open-edit-modal"></ion-icon>
-      </ion-fab-button>
-    </ion-fab-list>
-  </ion-fab>
 
   <ion-card>
     <ion-card-header class="ion-text-center">
@@ -40,14 +26,17 @@
       <canvas #doughnutCanvas></canvas>
     </ion-card-content>
   </ion-card>
-  <ion-content class="ion-padding">
-    <ion-item lines="none">
-      <ion-text>{{daysLeftInMonth}} days left until next cycle</ion-text>
-    </ion-item>
-    <ion-item lines="none">
-      <ion-text>Status: {{status}}</ion-text>
-    </ion-item>
-  </ion-content>
+
+  <ion-item lines="none">
+    <div class="ion-text-center">
+      <h3>{{daysLeftInMonth}} days left until next cycles</h3>
+    </div>
+  </ion-item>
+  <ion-item lines="none">
+    <div class="ion-text-center">
+      <h3>Status: {{status}}</h3>
+    </div>
+  </ion-item>
 
     <ion-modal trigger="open-edit-modal">
       <ng-template>
@@ -64,7 +53,7 @@
           </ion-toolbar>
         </ion-header>
 
-        <ion-content class="ion-padding">
+        <ion-content class="ion-padding" id="modal-content">
 
           <form [formGroup]="expenseDeets" (ngSubmit)="addExpense()">
 
@@ -83,7 +72,7 @@
 
             <ion-modal id="date-modal" keepContentsMounted="true">
               <ng-template>
-                <ion-content>
+                <ion-content id="date-modal-content">
                   <ion-datetime
                     id="1datetime"
                     presentation="date"
@@ -114,3 +103,17 @@
     </ion-modal>
 
 </ion-content>
+
+<ion-fab slot="fixed" vertical="bottom" horizontal="center">
+  <ion-fab-button>
+    <ion-icon name="add-circle-outline"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-list side="top">
+    <ion-fab-button>
+      <ion-icon name="camera-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button>
+      <ion-icon name="create-outline" id="open-edit-modal"></ion-icon>
+    </ion-fab-button>
+  </ion-fab-list>
+</ion-fab>

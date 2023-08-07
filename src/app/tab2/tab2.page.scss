@@ -1,9 +1,19 @@
-#month-modal {
-  --width: 352px;
-  --height: 240px;
+#ion-content-main
+{
+  top: 5%;
+  width: 100%;
+  height: 90%;
+  margin: auto;
+}
+
+#month-modal
+{
+  --width: 330px;
+  --height: 250px;
   --border-radius: 8px;
 }
 
-#month-modal ion-datetime {
-  height: 382px;
+#modal-content
+{
+  --overflow: hidden;
 }

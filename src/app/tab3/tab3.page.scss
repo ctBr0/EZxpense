@@ -1,9 +1,24 @@
-#budget-modal {
-  --width: 290px;
-  --height: 382px;
+ion-content
+{
+  --overflow: hidden;
+}
+
+#main-card
+{
+  top: 30%;
+  width: 80%;
+  height: 40%;
+  margin: auto;
+}
+
+#budget-modal
+{
+  --width: 280px;
+  --height: 330px;
   --border-radius: 8px;
 }
 
-#budget-modal ion-card {
-  height: 382px;
+#modal-content
+{
+  --overflow: hidden;
 }

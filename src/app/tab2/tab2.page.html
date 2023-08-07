@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" id="ion-content-main">
 
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content
@@ -29,7 +29,7 @@
       
         <ng-template>
 
-            <ion-content>
+            <ion-content id="modal-content">
 
               <ion-datetime
                 id="datetime"
