@@ -3,6 +3,6 @@
 Hybrid app to track personal expenses<br />
 
 Technologies used:<br />
-Angular<br />
-Ionic <br />
-Firebase <br />
+Angular (HTML,CSS,TypeScript)<br />
+Ionic (Hybrid app framework)<br />
+Firebase (NoSQL database)<br />
