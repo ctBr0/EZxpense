@@ -73,7 +73,7 @@ export class Tab2Page implements OnInit {
       this.expense_array = this.getExpenseArrayByMonth(5,this.month,this.year);
 
       // update category chart
-      this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.currISOdate),this.dataService.parseIsoDateStringYear(this.currISOdate));
+      this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpensesByCategory(this.dataService.parseIsoDateStringMonth(this.currISOdate),this.dataService.parseIsoDateStringYear(this.currISOdate));
       this.doughnutChart.update();
 
       await loading.dismiss();
@@ -89,14 +89,14 @@ export class Tab2Page implements OnInit {
   // called by ionchange()
   async updateChart(ev: any) {
     // update category chart
-    this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(ev.detail.value),this.dataService.parseIsoDateStringYear(ev.detail.value));
+    this.doughnutChart.data.datasets[0].data = await this.dataService.queryExpensesByCategory(this.dataService.parseIsoDateStringMonth(ev.detail.value),this.dataService.parseIsoDateStringYear(ev.detail.value));
     this.doughnutChart.update();
   }
 
   async doughnutChartMethod() {
     // query values from database
-    const [groceriesC, diningC, suppliesC, transportationC, entertainmentC]:any = await this.dataService.queryExpenseCountByCategory(this.dataService.parseIsoDateStringMonth(this.currISOdate),this.dataService.parseIsoDateStringYear(this.currISOdate));
-
+    const [groceriesC, diningC, suppliesC, transportationC, entertainmentC]:any = await this.dataService.queryExpensesByCategory(this.dataService.parseIsoDateStringMonth(this.currISOdate),this.dataService.parseIsoDateStringYear(this.currISOdate));
+    
     // create the chart
     this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, {
       type: 'doughnut',

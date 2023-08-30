@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { doc, query, setDoc, collection, addDoc, limit, where, updateDoc, Firestore, orderBy, getCountFromServer } from '@angular/fire/firestore';
+import { doc, query, getDocs, setDoc, collection, addDoc, limit, where, updateDoc, Firestore, orderBy, getCountFromServer } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { serverTimestamp } from '@angular/fire/firestore';
 
@@ -69,28 +69,60 @@ export class DataService {
     }
   }
 
-  async queryExpenseCountByCategory(month:number, year:number){
+  async queryExpensesByCategory(month:number, year:number){
 
     const user:any = this.auth.currentUser;
 
     try {
-      const col = collection(this.firestore, "users", user.uid, "expenses");
-      const groceriesQ = query(col, where("month", "==", month), where("year", "==", year), where("category", "==", "Groceries"));
-      const diningQ = query(col, where("month", "==", month), where("year", "==", year), where("category", "==", "Dining"));
-      const suppliesQ = query(col, where("month", "==", month), where("year", "==", year), where("category", "==", "Supplies"));
-      const transportationQ = query(col, where("month", "==", month), where("year", "==", year), where("category", "==", "Transportation"));
-      const entertainmentQ = query(col, where("month", "==", month), where("year", "==", year), where("category", "==", "Entertainment"));
 
-      const groceriesC:number = (await getCountFromServer(groceriesQ)).data().count;
-      const diningC:number = (await getCountFromServer(diningQ)).data().count;
-      const suppliesC:number = (await getCountFromServer(suppliesQ)).data().count;
-      const transportationC:number = (await getCountFromServer(transportationQ)).data().count;
-      const entertainmentC:number = (await getCountFromServer(entertainmentQ)).data().count;
+      const col = collection(this.firestore, "users", user.uid, "expenses");
+      const monthQ = query(col, where("month", "==", month), where("year", "==", year));
+    
+      let groceriesC:number = 0;
+      let diningC:number = 0;
+      let suppliesC:number = 0;
+      let transportationC:number = 0;
+      let entertainmentC:number = 0;
+
+      const querySnapshot = await getDocs(monthQ);
+      querySnapshot.forEach((doc:any) => {
+
+        switch(doc.data().category) {
+
+          case "Groceries": {
+            groceriesC = groceriesC + doc.data().amount;
+            break;
+          }
+
+          case "Dining": {
+            diningC = diningC + doc.data().amount;
+            break;
+          }
+
+          case "Supplies": {
+            suppliesC = suppliesC + doc.data().amount;
+            break;
+          }
+
+          case "Transportation": {
+            transportationC = transportationC + doc.data().amount;
+            break;
+          }
+
+          case "Entertainment": {
+            entertainmentC = entertainmentC + doc.data().amount;
+            break;
+          }
+
+        }
+
+      });
 
       return [groceriesC, diningC, suppliesC, transportationC, entertainmentC];
     } catch(e) {
       return null;
     }
+
   }
 
   /*
